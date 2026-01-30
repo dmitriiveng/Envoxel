@@ -8,7 +8,9 @@ std::function<std::string(const void*)> StringSerializationFunctionsMapper::get_
 {
     const std::type_index type_index_v(type_info_v);
     const auto it = data.find(type_index_v);
-    if (it == data.end()) throw std::logic_error("doesn't have a serialization function");
+    if (it == data.end()) {
+        throw std::logic_error(std::string("No deserialization function for type: ") + type_info_v.name());
+    }
     return it->second;
 }
 
@@ -18,7 +20,7 @@ void StringSerializationFunctionsMapper::add_function(
 {
     const std::type_index type_index_v(type_info_v);
     if (data.contains(type_index_v)) {
-        throw std::logic_error("type already has serialization function");
+        throw std::logic_error(std::string("type already has serialization function") + type_info_v.name());
     }
 
     data.emplace(type_index_v, function);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ISerializationFunctionsMapper.hpp"
+#include "serde/serialization/mapper/ISerializationFunctionsMapper.hpp"
 
 #include <string>
 
