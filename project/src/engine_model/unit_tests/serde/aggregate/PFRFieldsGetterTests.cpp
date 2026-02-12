@@ -1,25 +1,48 @@
 #include <gtest/gtest.h>
-#include "serde/aggregate/PFRFieldsGetter.hpp"
+#include "serde/aggregate/PfrFieldsGetter.hpp"
 
-namespace {
-    struct A final {
-        int a;
-        bool b;
-        double c;
-    };
+#include <string>
+#include <tuple>
+
+struct TestStruct {
+    int a;
+    double b;
+    std::string c;
+};
+
+TEST(PfrFieldsGetterTest, FieldCount) {
+    EXPECT_EQ(PfrFieldsGetter::field_count<TestStruct>(), 3);
 }
 
-TEST(PFRFieldsGetter, GetFields) {
-    PFRFieldsGetter getter;
+TEST(PfrFieldsGetterTest, ForEachField) {
+    TestStruct obj{42, 3.14, "hello"};
+    int intSum = 0;
+    double doubleSum = 0.0;
+    std::string concatenated;
 
-    A a{10, true, 1.5};
-
-    std::vector<std::string> out;
-    getter.for_each_field(a, [&](auto& field) {
-        out.push_back(std::to_string(field));
+    PfrFieldsGetter::for_each_field(obj, [&](auto& field) {
+        if constexpr (std::is_same_v<decltype(field), int&>) {
+            intSum += field;
+        } else if constexpr (std::is_same_v<decltype(field), double&>) {
+            doubleSum += field;
+        } else if constexpr (std::is_same_v<decltype(field), std::string&>) {
+            concatenated += field;
+        }
     });
 
-    EXPECT_EQ(out[0], std::to_string(a.a));
-    EXPECT_EQ(out[1], std::to_string(a.b));
-    EXPECT_EQ(out[2], std::to_string(a.c));
+    EXPECT_EQ(intSum, 42);
+    EXPECT_DOUBLE_EQ(doubleSum, 3.14);
+    EXPECT_EQ(concatenated, "hello");
 }
+
+TEST(PfrFieldsGetterTest, TupleType) {
+    const TestStruct obj{1, 2.5, "abc"};
+
+    using TupleType = PfrFieldsGetter::tuple_type<TestStruct>;
+    const TupleType tuple = boost::pfr::structure_to_tuple(obj);
+
+    EXPECT_EQ(std::get<0>(tuple), 1);
+    EXPECT_DOUBLE_EQ(std::get<1>(tuple), 2.5);
+    EXPECT_EQ(std::get<2>(tuple), "abc");
+}
+

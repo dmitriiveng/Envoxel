@@ -7,8 +7,6 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-cmake_policy(SET CMP0144 NEW)
-
 set(Boost_ROOT /usr/local)
 set(Boost_INCLUDEDIR /usr/local/include)
 set(Boost_LIBRARYDIR /usr/local/lib)
@@ -29,9 +27,9 @@ file(GLOB_RECURSE MODEL_SOURCES "src/engine_model/*.cpp")
 add_library(${MODEL_NAME} ${MODEL_SOURCES})
 
 target_include_directories(${MODEL_NAME}
-    PUBLIC
-    src/engine_model/_include
-    ${Boost_INCLUDE_DIRS}
+        PUBLIC
+        src/engine_model/_include
+        ${Boost_INCLUDE_DIRS}
 )
 
 # engine model tests
