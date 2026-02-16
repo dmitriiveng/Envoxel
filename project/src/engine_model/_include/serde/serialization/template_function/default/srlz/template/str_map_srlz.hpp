@@ -7,10 +7,10 @@
 
 template<typename K, typename V>
 struct serde::srlz::func::Serializer<std::map<K, V>, std::string> {
-    static std::string deserialize(const std::map<K, V>& input) {
+    static std::string serialize(const std::map<K, V>& input) {
         std::map<std::string, std::string> str_map;
-        for (const std::pair<std::string, std::string> pair : input) {
-            str_map.insert(
+        for (const auto& pair : input) {
+            str_map.emplace(
                 Serializer<K, std::string>::serialize(pair.first),
                 Serializer<V, std::string>::serialize(pair.second)
             );

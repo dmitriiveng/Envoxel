@@ -7,10 +7,10 @@
 
 template<typename T>
 struct serde::srlz::func::Serializer<std::vector<T>, std::string> {
-    static std::string deserialize(const std::vector<T>& input) {
+    static std::string serialize(const std::vector<T>& input) {
         std::vector<std::string> result;
         for (const T& value : input) {
-            result.push_back(Serializer<std::string, T>::serialize(value));
+            result.push_back(Serializer<T, std::string>::serialize(value));
         }
 
         return SequenceBuilder<std::string>::build(result);

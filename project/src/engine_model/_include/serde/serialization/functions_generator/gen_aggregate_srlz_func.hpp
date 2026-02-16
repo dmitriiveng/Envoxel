@@ -14,7 +14,7 @@ namespace serde::srlz {
         typename AggregateFieldsGetter
     >
     requires std::is_aggregate_v<InputV>
-    [[nodiscard]] type_erased_srlz_func<InputV> generate_aggregate_srlz_function() {
+    [[nodiscard]] type_erased_srlz_func<OutputV> gen_aggregate_srlz_func() {
 
         auto serialization = [](const void* input) -> OutputV {
             const InputV input_v = *static_cast<const InputV*>(input);
@@ -22,7 +22,7 @@ namespace serde::srlz {
 
             AggregateFieldsGetter::for_each_field(input_v, [&output_vector](const auto& field) {
                 output_vector.push_back(
-                    func::serialize<decltype(field), OutputV>(field)
+                    func::serialize<std::remove_cv_t<std::remove_reference_t<decltype(field)>>, OutputV>(field)
                 );
             });
 

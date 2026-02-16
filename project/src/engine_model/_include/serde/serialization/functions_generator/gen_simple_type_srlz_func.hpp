@@ -9,14 +9,11 @@ namespace serde::srlz {
         typename OutputV
     >
     [[nodiscard]] type_erased_srlz_func<OutputV>
-    generate_simple_type_srlz_function() {
+    gen_simple_type_srlz_func() {
         auto serialization = [](const void* input) {
-            OutputV result =
-                func::serialize<InputV, OutputV>(*static_cast<const InputV*>(input));
-
+            OutputV result = func::serialize<InputV, OutputV>(*static_cast<const InputV*>(input));
             return result;
         };
-
         return serialization;
     }
 }

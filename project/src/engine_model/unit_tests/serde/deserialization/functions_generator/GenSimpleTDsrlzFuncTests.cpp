@@ -45,6 +45,16 @@ namespace {
             std::vector<int>({5, 6})}));
     }
 
+    TEST(GenerateSimpleTypeDsrlzFunctionTest, ComplexTemplateSpecialization) {
+        const auto func = gen_simple_dsrlz_func<std::string, std::vector<std::map<int, double>>>();
+
+        VoidPtrAny result = func("[[[1][1.3]][[2][2.3]]][[[1][1.123]][[2][2.4]]]");
+
+        std::vector<std::map<int, double>> r = result.get_value<std::vector<std::map<int, double>>>();
+        std::vector<std::map<int, double>> v = {{{1, 1.3}, {2, 2.3}}, {{1, 1.123}, {2, 2.4}}};
+        EXPECT_EQ(r, v);
+    }
+
     TEST(GenerateSimpleTypeDsrlzFunctionTest, MapSpecialization) {
         const auto func = gen_simple_dsrlz_func<std::string, std::map<int, std::vector<int>>>();
 
