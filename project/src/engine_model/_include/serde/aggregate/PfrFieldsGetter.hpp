@@ -9,7 +9,7 @@ struct PfrFieldsGetter {
     }
 
     template<typename Aggregate>
-    static std::size_t field_count() {
+    static constexpr std::size_t field_count() {
         return boost::pfr::tuple_size_v<Aggregate>;
     }
 

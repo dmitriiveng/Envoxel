@@ -3,7 +3,6 @@
 #include <any>
 #include <stdexcept>
 #include <type_traits>
-#include <functional>
 
 #include "serde/deserialization/template_function/dsrlz/deserialize.hpp"
 #include "serde/deserialization/template_function/data_structures/from_sequence/from_sequence.hpp"
@@ -14,45 +13,46 @@ namespace serde::dsrlz {
 
     template<
         typename InputV,
-        typename ReturnType,
+        typename OutputV,
         typename AggregateFieldsGetter
     >
-    requires std::is_aggregate_v<ReturnType>
-    [[nodiscard]] type_erased_dsrlz_func<InputV> generate_aggregate_dsrlz_function() {
+    requires std::is_aggregate_v<OutputV>
+    [[nodiscard]] type_erased_dsrlz_func<InputV> gen_aggregate_dsrlz_func() {
 
         auto deserialization = [](const InputV& input) -> VoidPtrAny {
             std::vector<InputV> input_vector;
             try {
-                input_vector = from_sequence<std::vector<InputV>>(input);
+                input_vector = func::from_sequence<InputV>(input);
             }
             catch (std::runtime_error& e) {
                 throw std::runtime_error(std::string("Failed to deserialize aggregate: ") + e.what());
             }
 
-            constexpr std::size_t FieldsCount = AggregateFieldsGetter::template field_count<ReturnType>;
+            constexpr std::size_t fields_count = AggregateFieldsGetter::template field_count<OutputV>();
 
-            if (input_vector.size() != FieldsCount) {
+            if (input_vector.size() != fields_count) {
                 throw std::logic_error(
-                    std::string("Input size does not match number of fields in aggregate of type: ") + typeid(ReturnType).name()
+                    std::string(std::string("Input size (") + std::to_string(input_vector.size()) + ") does not match number of fields (" + std::to_string(fields_count) + ") in aggregate of type: ") + typeid(OutputV).name()
                 );
             }
 
-            // Getting tuple type for field of ReturnType
-            using TupleType = AggregateFieldsGetter::template tuple_type<ReturnType>;
+            // Getting tuple type for field of OutputV
+            using TupleType = AggregateFieldsGetter::template tuple_type<OutputV>;
 
             // Making a tuple of fields from a vector of InputV
             auto tuple_filled = [&]<std::size_t... I>(std::index_sequence<I...>) {
                 // Deserialize function should be declared for needed type
                 return std::make_tuple(
                     func::deserialize<
+                        InputV,
                         std::remove_cv_t<std::remove_reference_t<std::tuple_element_t<I, TupleType>>>
                     >(input_vector[I])...
                 );
-            }(std::make_index_sequence<FieldsCount>{});
+            }(std::make_index_sequence<fields_count>{});
 
             // Using aggregate constructor
-            ReturnType aggregate_result = std::apply([](auto&&... args) {
-                return ReturnType{std::forward<decltype(args)>(args)...};
+            OutputV aggregate_result = std::apply([](auto&&... args) {
+                return OutputV{std::forward<decltype(args)>(args)...};
             }, tuple_filled);
 
             return VoidPtrAny(std::move(aggregate_result));

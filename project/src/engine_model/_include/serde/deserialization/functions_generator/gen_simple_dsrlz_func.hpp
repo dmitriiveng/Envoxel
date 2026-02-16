@@ -10,7 +10,7 @@ namespace serde::dsrlz {
         typename OutputV
     >
     [[nodiscard]] type_erased_dsrlz_func<InputV>
-    generate_simple_type_dsrlz_function() {
+    gen_simple_dsrlz_func() {
         auto deserialization = [](const InputV& input) {
             OutputV result = func::deserialize<InputV, OutputV>(input);
 
