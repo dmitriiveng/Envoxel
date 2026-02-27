@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 4.2.3)
 
 project(Envoxel LANGUAGES CXX)
 
@@ -8,14 +8,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Modules
-set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "cxx_modules")
+set(CMAKE_EXPERIMENTAL_CXX_MODULE_DYNDEP 1)
+set(CMAKE_EXPERIMENTAL_CXX_MODULE_STD 1)
+
+# Experimental C++ modules
 set(CMAKE_EXPERIMENTAL_CXX_MODULE_DYNDEP 1)
 set(CMAKE_EXPERIMENTAL_CXX_MODULE_STD 1)
 
 # Dependencies
 find_package(Boost REQUIRED)
 find_package(GTest REQUIRED)
-find_package(TBB REQUIRED)
 
 # --- Serde library ---
 
