@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <concepts>
 #include <string_view>
 
 using Entity = std::size_t;
@@ -25,6 +26,7 @@ concept CCmpRepository = requires(R& r, const R& cr, Entity e, std::string name)
     // Foreach
     { r.template foreach_of<struct T>([](Entity, T&){}) } -> std::same_as<void>;
     { r.template foreach_only_of<struct T>([](Entity, T&){}) } -> std::same_as<void>;
+
     // Sends to callback name of the component + void* on memory where it is stored
     { r.for_each_entity([](Entity, std::vector<std::pair<std::string_view, void*>>) {}) }
         -> std::same_as<void>;
@@ -32,7 +34,8 @@ concept CCmpRepository = requires(R& r, const R& cr, Entity e, std::string name)
     // Const foreach
     { cr.template foreach_of<struct T>([](Entity, const T&){}) } -> std::same_as<void>;
     { cr.template foreach_only_of<struct T>([](Entity, const T&){}) } -> std::same_as<void>;
-    // Sends to callback name of the component + void* on memory where it is stored
+
+    // Sends to callback name of the component + void* on memory where it is stored (const version)
     { cr.for_each_entity([](Entity, std::vector<std::pair<std::string_view, const void*>>) {}) } 
         -> std::same_as<void>;   
 };
